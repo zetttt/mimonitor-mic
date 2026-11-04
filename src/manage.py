@@ -119,24 +119,22 @@ def build_bridge(staging, args, config, layout):
     scrcpy = executable('scrcpy', args.scrcpy or config.get('scrcpy'))
     config.update(scrcpy=scrcpy, server=find_server(scrcpy, args.server or config.get('server')),
                   python=os.path.abspath(sys.executable))
-    swiftc = checked(['/usr/bin/xcrun', '--find', 'swiftc']).stdout.strip()
-    if not Path(swiftc).is_file():
-        raise ValueError('Install Xcode Command Line Tools: xcode-select --install')
     runtime = staging / 'runtime'
     runtime.mkdir(mode=0o700)
     for name in ('bridge.py', 'settings.py'):
         shutil.copy2(SOURCE / name, runtime / name)
     target = platform.machine() + '-apple-macos13.0'
-    checked([swiftc, '-swift-version', '5', '-target', target, '-O',
-             SOURCE / 'audio-output.swift', '-o', runtime / 'audio-output'], timeout=120)
+    compiler = ['/usr/bin/xcrun', '--sdk', 'macosx', 'swiftc',
+                '-swift-version', '5', '-target', target, '-O']
+    checked([*compiler, SOURCE / 'audio-output.swift', '-o', runtime / 'audio-output'], timeout=120)
     if not args.no_start:
         require_audio_output(runtime / 'audio-output')
     app = staging / (APP_NAME + '.app')
     contents = app / 'Contents'
     macos = contents / 'MacOS'
     macos.mkdir(parents=True)
-    checked([swiftc, '-swift-version', '5', '-target', target, '-O', '-parse-as-library',
-             SOURCE / 'service.swift', '-o', macos / 'mimonitor-mic'], timeout=120)
+    checked([*compiler, '-parse-as-library', SOURCE / 'service.swift',
+             '-o', macos / 'mimonitor-mic'], timeout=120)
     info = {'CFBundleIdentifier': APP_ID, 'CFBundleName': APP_NAME,
             'CFBundleDisplayName': APP_NAME, 'CFBundleExecutable': 'mimonitor-mic',
             'CFBundlePackageType': 'APPL', 'CFBundleShortVersionString': '0.1.0',

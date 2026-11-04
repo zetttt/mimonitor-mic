@@ -6,8 +6,8 @@ test:
 
 build:
 	mkdir -p .build
-	xcrun swiftc -swift-version 5 src/audio-output.swift -o .build/audio-output
-	xcrun swiftc -swift-version 5 -parse-as-library src/service.swift -o .build/mimonitor-mic
+	xcrun --sdk macosx swiftc -swift-version 5 src/audio-output.swift -o .build/audio-output
+	xcrun --sdk macosx swiftc -swift-version 5 -parse-as-library src/service.swift -o .build/mimonitor-mic
 
 check: test build
 	bash -n Install.command install.sh mic.sh uninstall.sh
