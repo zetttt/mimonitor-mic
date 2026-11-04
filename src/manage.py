@@ -21,8 +21,11 @@ SOURCE = Path(__file__).resolve().parent
 
 
 def checked(args, timeout=60):
-    return subprocess.run([str(arg) for arg in args], check=True, capture_output=True,
-                          text=True, timeout=timeout)
+    try:
+        return subprocess.run([str(arg) for arg in args], check=True, capture_output=True,
+                              text=True, timeout=timeout)
+    except subprocess.CalledProcessError as error:
+        raise ValueError(str(error) + '\n' + (error.stderr or '').strip()) from error
 
 
 def cleanup(args, timeout=12):

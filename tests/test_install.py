@@ -16,6 +16,13 @@ from settings import APP_ID, ADB_PORT, Layout, load_config
 
 
 class ConfigurationTests(unittest.TestCase):
+    def test_failed_command_reports_stderr_and_preserves_cause(self):
+        error = subprocess.CalledProcessError(1, ['swiftc'], stderr='compiler detail')
+        with patch.object(manage.subprocess, 'run', side_effect=error):
+            with self.assertRaisesRegex(ValueError, 'compiler detail') as raised:
+                manage.checked(['swiftc'])
+        self.assertIs(raised.exception.__cause__, error)
+
     def test_authorized_monitor_does_not_wait_for_an_unrelated_phone(self):
         ready = {'serial': 'TEST_MONITOR', 'state': 'device', 'model': 'MiTV_MFFU1'}
         pending = {'serial': 'PHONE', 'state': 'unauthorized', 'model': ''}
