@@ -1,0 +1,22 @@
+name: Bug report / 故障反馈
+description: Report a reproducible failure with redacted details.
+body:
+  - type: input
+    id: environment
+    attributes:
+      label: Device and system versions
+      description: Monitor model, firmware, macOS, scrcpy, Python and BlackHole versions.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps and observed result
+      description: What did you do, what happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: errors
+    attributes:
+      label: Redacted error messages
+      description: Remove device serials, personal paths and private content. Do not attach recordings or raw config.json.
