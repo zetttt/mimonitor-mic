@@ -126,7 +126,7 @@ def build_bridge(staging, args, config, layout):
     target = platform.machine() + '-apple-macos13.0'
     compiler = ['/usr/bin/xcrun', '--sdk', 'macosx', 'swiftc',
                 '-swift-version', '5', '-target', target, '-O']
-    checked([*compiler, SOURCE / 'audio-output.swift', '-o', runtime / 'audio-output'], timeout=120)
+    checked([*compiler, '-parse-as-library', SOURCE / 'audio-output.swift', '-o', runtime / 'audio-output'], timeout=120)
     if not args.no_start:
         require_audio_output(runtime / 'audio-output')
     app = staging / (APP_NAME + '.app')
